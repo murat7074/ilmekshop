@@ -168,7 +168,7 @@ const userRoutes = () => {
         }
       />
       <Route
-        path='/me/orders/stripe-success'
+        path='/me/orders/shopier-success'
         element={
           <ProtectedRoute>
             <StripeSuccess />

@@ -8,7 +8,7 @@ export const orderApi = createApi({
 
 }),
 
-  tagTypes: ['Order', 'MyOrder', 'AdminOrders', 'User', 'Products'],
+   tagTypes: ['Order', 'MyOrder', 'AdminOrders', 'User', 'Products'],
   endpoints: (builder) => ({
     createNewOrder: builder.mutation({
       query(body) {
@@ -31,7 +31,7 @@ export const orderApi = createApi({
       providesTags: ['MyOrder'],
     }),
 
-    stripeCheckoutSession: builder.mutation({
+    shopierCheckoutSession: builder.mutation({
       query(body) {
         return {
           url: '/payment/checkout_session',
@@ -88,7 +88,7 @@ export const orderApi = createApi({
 
 export const {
   useCreateNewOrderMutation,
-  useStripeCheckoutSessionMutation,
+  useShopierCheckoutSessionMutation,
   useMyOrdersQuery,
   useOrderDetailsQuery,
   useLazyGetDashboardSalesQuery,

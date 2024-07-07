@@ -1,114 +1,102 @@
-import React, { useEffect, useState } from 'react'
-import MetaData from '../layout/MetaData'
-import { useSelector, useDispatch } from 'react-redux'
-import CheckoutSteps from './CheckoutSteps'
-import { calculateOrderCost } from '../../helpers/helpers'
+import React, { useEffect, useState } from 'react';
+import MetaData from '../layout/MetaData';
+import { useSelector, useDispatch } from 'react-redux';
+import CheckoutSteps from './CheckoutSteps';
+import { calculateOrderCost } from '../../helpers/helpers';
 import {
   useCreateNewOrderMutation,
-  useStripeCheckoutSessionMutation,
-} from '../../redux/api/orderApi'
-import { toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+  useShopierCheckoutSessionMutation, // useShopierCheckoutSessionMutation olarak değiştirdim
+} from '../../redux/api/orderApi';
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import {
   clearCart,
   removeStockOutItemFromCart,
-} from '../../redux/features/cartSlice'
+} from '../../redux/features/cartSlice';
 
 const PaymentMethod = () => {
-  const [method, setMethod] = useState('')
-  const [errorProductStock, setErrorProductStock] = useState([])
+  const [method, setMethod] = useState('');
+  const [errorProductStock, setErrorProductStock] = useState([]);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { shippingInfo, shippingInvoiceInfo, cartItems } = useSelector(
     (state) => state.cart
-  )
+  );
 
-  const [createNewOrder, { error, isSuccess }] = useCreateNewOrderMutation()
+  const [createNewOrder, { error, isSuccess }] = useCreateNewOrderMutation();
 
   const [
-    stripeCheckoutSession,
+    shopierCheckoutSession,
     { data: checkoutData, error: checkoutError, isLoading },
-  ] = useStripeCheckoutSessionMutation()
+  ] = useShopierCheckoutSessionMutation(); // shopierCheckoutSession olarak değiştirdim
 
   useEffect(() => {
     if (checkoutData) {
-      window.location.href = checkoutData?.url // user ı ödeme yapması için stripe ın url ine yönlendireceğiz  ==> checkoutData.url
+      const newWindow = window.open('', '_blank');
+      newWindow.document.open();
+      newWindow.document.write(checkoutData);
+      newWindow.document.close();
     }
 
     if (checkoutError) {
-      toast.error(checkoutError?.data?.message)
+      toast.error(checkoutError?.data?.message);
     }
 
     if (checkoutError) {
-      const errorData = checkoutError?.data 
+      const errorData = checkoutError?.data;
       if (errorData && Array.isArray(errorData.errors)) {
-       
-        setErrorProductStock(errorData.errors)
+        setErrorProductStock(errorData.errors);
 
         errorData.errors.forEach((err) => {
-          
-          const toastMessage = err.msg
-          toast.error(toastMessage)
+          const toastMessage = err.msg;
+          toast.error(toastMessage);
+        });
 
-          
-        })
-
-        toast.error('Sepetinizi Kontrol Ediniz.')
+        toast.error('Sepetinizi Kontrol Ediniz.');
       } else {
-       
-        toast.error('Bilinmeyen bir hata oluştu.')
+        toast.error('Bilinmeyen bir hata oluştu.');
       }
     }
-  }, [checkoutData, checkoutError])
+  }, [checkoutData, checkoutError]);
 
   useEffect(() => {
     if (error) {
-      const errorData = error?.data 
+      const errorData = error?.data;
       if (errorData && Array.isArray(errorData.errors)) {
-       
-        setErrorProductStock(errorData.errors)
+        setErrorProductStock(errorData.errors);
 
         errorData.errors.forEach((err) => {
-        
-          const toastMessage = err.msg
-          toast.error(toastMessage)
+          const toastMessage = err.msg;
+          toast.error(toastMessage);
+        });
 
-         
-        })
-
-        toast.error('Sepetinizi Güncelleyin')
+        toast.error('Sepetinizi Güncelleyin');
       } else {
-       
-        toast.error('Bilinmeyen bir hata oluştu.')
+        toast.error('Bilinmeyen bir hata oluştu.');
       }
     }
 
     if (isSuccess) {
-      toast.success('Sipariş Oluşturuldu.') // kapıda ödeme
-      dispatch(clearCart())
-      navigate('/me/orders')
+      toast.success('Sipariş Oluşturuldu.'); // kapıda ödeme
+      dispatch(clearCart());
+      navigate('/me/orders');
     }
-  }, [error, isSuccess])
+  }, [error, isSuccess]);
 
   useEffect(() => {
     if (errorProductStock?.length > 0) {
-      dispatch(removeStockOutItemFromCart(errorProductStock))
-       navigate('/cart')
+      dispatch(removeStockOutItemFromCart(errorProductStock));
+      navigate('/cart');
     }
-  }, [errorProductStock])
+  }, [errorProductStock]);
 
   const submitHandler = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const { itemsPrice, shippingPrice, totalPrice } =
-      calculateOrderCost(cartItems)
-
-   
+    const { itemsPrice, shippingPrice, totalPrice } = calculateOrderCost(cartItems);
 
     if (method === 'COD') {
       // Create COD Order
@@ -124,13 +112,13 @@ const PaymentMethod = () => {
           status: 'Not Paid',
         },
         paymentMethod: 'COD',
-      }
+      };
 
-      createNewOrder(orderData)
+      createNewOrder(orderData);
     }
 
     if (method === 'Card') {
-      // Stripe Checkout
+      // Shopier Checkout
       const orderData = {
         shippingInfo,
         shippingInvoiceInfo,
@@ -139,11 +127,11 @@ const PaymentMethod = () => {
         shippingAmount: shippingPrice,
         taxAmount: 0, // backendde hesaplanacak
         totalAmount: totalPrice,
-      }
+      };
 
-      stripeCheckoutSession(orderData)
+      shopierCheckoutSession(orderData); // shopierCheckoutSession olarak değiştirdim
     }
-  }
+  };
 
   return (
     <main className='align-page min-h-screen'>
@@ -197,7 +185,12 @@ const PaymentMethod = () => {
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default PaymentMethod
+export default PaymentMethod;
+
+
+
+
+
