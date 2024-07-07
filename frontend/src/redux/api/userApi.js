@@ -5,7 +5,7 @@ export const userApi = createApi({
   reducerPath: 'userApi',
 
     baseQuery: fetchBaseQuery({
-  baseUrl:'https://beybuilmek.onrender.com/api/v1',
+   baseUrl:'https://ilmekshop.onrender.com/api/v1',
 
 }),
 
