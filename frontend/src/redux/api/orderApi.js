@@ -31,14 +31,23 @@ export const orderApi = createApi({
       providesTags: ['MyOrder'],
     }),
 
-    shopierCheckoutSession: builder.mutation({
-      query(body) {
-        return {
-          url: '/payment/checkout_session',
-          method: 'POST',
-          body,
-        }
-      },
+    // shopierCheckoutSession: builder.mutation({
+    //   query(body) {
+    //     return {
+    //       url: '/payment/checkout_session',
+    //       method: 'POST',
+    //       body,
+    //     }
+    //   },
+    // }),
+
+      shopierCheckoutSession: builder.mutation({
+      query: (orderData) => ({
+        url: '/payment/checkout_session',
+        method: 'POST',
+        body: orderData,
+        responseHandler: 'text', // Response'u text olarak işle
+      }),
     }),
     getDashboardSales: builder.query({
       query: ({ startDate, endDate }) =>
