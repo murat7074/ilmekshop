@@ -80,6 +80,8 @@ export const shopierCheckoutSession = catchAsyncErrors(
       fail_url: `${process.env.FRONTEND_URL}`,
     };
 
+    console.log("requestData",requestData);
+
     try {
       const response = await axios.post(SHOPIER_API_URL, requestData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
